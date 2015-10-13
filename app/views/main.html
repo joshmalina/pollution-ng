@@ -1,0 +1,25 @@
+<div class="jumbotron">
+  <h1>AirBuddy</h1>
+  <p class="lead">
+    <!--img src="images/yeoman.png" alt="I'm Yeoman"><br-->
+    Telling you when, if ever, the air will be clean in Beijing.
+  </p>
+</div>
+
+<h4 ng-hide="predictions" class="text-center">{{until}}</h4>
+
+
+<table class="table table-bordered table-condensed" ng-if="predictions">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Projected AQI</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="obj in predictions">
+      <td>{{obj.t}}</td>
+      <td>{{obj.p}}</td>
+    </tr>
+  </tbody>
+</table>
