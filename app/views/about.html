@@ -1,1 +1,54 @@
-<p>This is the about view.</p>
+<p>
+
+<h4>Obstacles</h4>
+
+Well it turns out to be the case that the first data science project I attempted to solve was a very tricky one indeed.
+
+Unlike your boilerplate number recognition system, or logistic regression fraud detection system, the problem at hand -- forecasting of pollution values ten days in the future -- requires an altogether different approach to minimize the predictive error. And it's all about time.
+
+In the case of so-called time series data, a foundational assumption of standard statistical and machine learning techniques is violated: independence of feature variables.
+
+What does this mean, exactly? In probability, the concept of independence has a very particular meaning. Consider an event A and an event B. Intuitively (as opposed to mathematically), we can say that A is independent to B if knowing A does not help us know B or its complement.
+
+More concretely, let's say event A is your wearing of pajamas and event B is the queen of England eating a sandwich for lunch. Obviously, knowing that you are wearing pajamas does not help us know that either the queen is or is not eating a sandwich for lunch. Of course, this is absurd (the queen never eats sandwiches), but it speaks to the idea of probabilistic independence for which the observations in a time series do not maintain.
+
+In the example of pollution data, it is very much the case that knowing the pollution value at 12pm helps you to know something about the pollution value at 1pm -- since time is continous, and some of the particles that were there an hour ago are still there now. The values are not independent and identitally distributed, as it were, and so it makes our model quite a bit more complicated. 
+
+Had I known this a year ago when started thinking about the problem of air pollution forecasting in Beijing, perhaps I would have taken a different tack.
+
+<h4>The problem</h4>
+
+<p>
+Can we predict air pollution values in Beijing? Of course. Can we do it correctly, every time? One time? These are more interesting questions.
+
+I am no climate scientist. I’m not even, (cry), a data scientist. But I did live in Beijing, China for four years and I did see the sky darken and the buildings disappear, and I did wear a mask when I rode my bike, and no, I don’t smoke cigarettes. Pollution is a killer problem — really, it does. How fast will it kill you? That is also an interesting statistical question. According to some reports (need attribution), every year in a city like Beijing leads to a 5-6 day loss in life. Of course, this is not an informative statistic, which leads to our first lesson: the paucity of means. 
+
+A mean (or average, as the lay people call it) is, roughly:
+
+the sum total of some things / the number of those things.
+
+So, in our case, this would be:
+
+(total time lost to pollution causing death in a population / number of people in the population)
+
+What’s misleading about this statistic is that nobody dies five days early from pollution. That wouldn’t be so bad. When you die from pollution, you die from heart disease, stroke, lung cancer, emphysema, or some other wonderful ailment. And when you die from those, you die 10 years early, or 20 years early. But most people don’t die of those ailments, and so the mean gives you 5 days. 
+
+A better statistic would be the percent increase in those ailments mentioned (heart disease, etc…) from living in a polluted environment. Then you could say: “Alright, living here makes me 20 percent more likely to have a stroke” (get correct number).
+
+So, we’ve established the why — well, sort of. Everyone would agree that health, and therefore pollution, might be an interesting thing to predict — but it’s no so simple. As a matter of fact, predicting pollution values would probably be of great interest to Chinese and foreigners living in Beijing — if you could predict it years into the future. That way, they could decide if they want to stick around, raise a family — they’d be more likely to if they knew the air quality would get better. But that is not at all what I’m doing here. I’m only predicting 10 days in advance — and given the normal human gestation period of 9 months — I’m not sure how relevant the predictions will be.
+
+Well, I can tell you when it would be useful, since I used to use something similar <link_to_smog_cast>, when I lived in Beijing, to schedule my exercise. That app would tell me when the next time it was going to be decent outside, and so I would plan my jogs around it — it was very nice. Now I’ve tried to do the same and a bit more, giving numeric values on the hour, every hour, for ten days in the future.
+
+Again, it is not so easily done. But it gave me an opportunity to explore a problem that used to be quite important to me (I don’t live in Beijing anymore) and allowed me to dive into statistics and machine learning and pro-human hacking, which is a neat thing.
+
+<h4>The data</h4>
+
+The data for this problem is of two kinds, bisected temporally:
+
++-------------------------+---------------------------+
+| Historical Weather Data | Historical Pollution Data |
++-------------------------+---------------------------+
+| Future Weather Data     | Future Pollution Data     |
++-------------------------+---------------------------+
+
+In order to build a model that predicts future pollution values, we need to first show the model a lot of examples of past pollution data alongside contemporary (or perhaps, lagged) weather values, so that in the future, the model might meet something it has seen before and say, "Hey! I know that guy. He's a 77".  
