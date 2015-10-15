@@ -1,25 +1,87 @@
-<p>
+<h1 class="text-center">Explain</h1>
 
-<h4>Obstacles</h4>
+<h4>Pollution: what's the problem?</h4>
 
-Well it turns out to be the case that the first data science project I attempted to solve was a very tricky one indeed.
+Air pollution in China is a grave environmental problem. The average air quality in Beijing (which is by no means the worst off) is about double what the World Health Organization considers healthy. Prolonged exposure is correlated with heart and lung disease and stroke. The air is often so polluted that the blue of the sky is literally invisible, buildings are hidden, and on very bad days, outdoor school activities are cancelled and people are encouraged to stay inside.
 
-Unlike your boilerplate number recognition system, or logistic regression fraud detection system, the problem at hand -- forecasting of pollution values ten days in the future -- requires an altogether different approach to minimize the predictive error. And it's all about time.
+I lived in Beijing for four years and had a wonderful time, but I often thought about this problem. When I wanted to exercise, I would often consider the best time of day to go for a jog. From previous research, I found out that the average is in the mid afternoon. But there wasn't much in the way of a forecast. How great would it have been to know in advance when the sky would be clean enough to go outside without a mask. That's how I come to this question of predictive modelling.
 
-In the case of so-called time series data, a foundational assumption of standard statistical and machine learning techniques is violated: independence of feature variables.
+Unlike many introductory problems in statistics and machine learning, the forecasting of pollution values carries with it the aspect of time that makes model building a bit trickier. In so-called time series data, the important assumption of independently distributed inputs is violated.
 
-What does this mean, exactly? In probability, the concept of independence has a very particular meaning. Consider an event A and an event B. Intuitively (as opposed to mathematically), we can say that A is independent to B if knowing A does not help us know B or its complement.
+What is this? In probability, two events A and B are indepdnent if knowing that A occurs offers no insight on the likelihood of B occuring. That is, my wearing of pajamas and the queen eating a sandwich are independent events because knowing one does not help you know the other. Of course, this example is absurd. As a matter of fact, the queen never eats sandwiches. But it speaks to the idea of independence for which the observations in a time series do not abide.
 
-More concretely, let's say event A is your wearing of pajamas and event B is the queen of England eating a sandwich for lunch. Obviously, knowing that you are wearing pajamas does not help us know that either the queen is or is not eating a sandwich for lunch. Of course, this is absurd (the queen never eats sandwiches), but it speaks to the idea of probabilistic independence for which the observations in a time series do not maintain.
+Simply put, knowing the air particulate count at 2pm may bear quite forcefully upon the number of particles at 3pm. Absent a terrible foreful gust of wind, some of those particles may still be there an hour later -- and so there is a correlation amongst out observations. Therefore, in order to accurately predict what happens at time t, we should consider what happend at t-1, t-2, etc...
 
-In the example of pollution data, it is very much the case that knowing the pollution value at 12pm helps you to know something about the pollution value at 1pm -- since time is continous, and some of the particles that were there an hour ago are still there now. The values are not independent and identitally distributed, as it were, and so it makes our model quite a bit more complicated. 
+<h4>Pollution: the data</h4>
 
-Had I known this a year ago when started thinking about the problem of air pollution forecasting in Beijing, perhaps I would have taken a different tack.
+There are roughly four kinds of data involved in this puzzle, three of which will be given to us. They are:
 
-<h4>The problem</h4>
++-------------------------+---------------------------+
+| Historical Weather Data | Historical Pollution Data |
++-------------------------+---------------------------+
+| Future Weather Data     | Future Pollution Data     |
++-------------------------+---------------------------+
 
-<p>
-Can we predict air pollution values in Beijing? Of course. Can we do it correctly, every time? One time? These are more interesting questions.
+The histroical weather data, including wind speed, wind direction, humidity, air pressure, and temperature -- were culled and cleaned and otherwise put together and made to wash behind its ears and stand up straight, and was provided via the good folks at Wunderground. Their API was called countless times, features were selected and loaded into a R or Python pandas dataframe. The historical pollution data, more easily accessed, can be found on the website of the US Embassy in Beijing -- which maintains an hourly reading of pollution levels going back eight years. 
+
+The third piece, future weather data, is also available via Wundeground as part of a 10 forecast. The fourth and final piece of data, future pollution, is our responsibility to create. 
+
+Since, as mentioned previously, there are strong correlations from one period of time to the next, we will also be giving our model information about what values of pollution occured in the recent past. 
+
+Our rows look thusly: 
+
+<table>
+	<thead>
+		<tr>
+			<th>#</th>
+			<th>Date / Time</th>
+			<th>Weather Conditions</th>
+			<th>Previous pollution value</th>
+			<th>Pollution value</th>
+		</tr>
+	</thead>
+</table>
+
+
+<h4>Pollution: how do we learn</h4>
+
+But what's inside the learning box? How will the machine become like a real boy, and learn to venture outside of the training set and make low-error predictions about pollution in the future? Mostly a bunch of math -- to be specific, it uses a machine learning algorithm called a random forest, which assembles a whole ensemble of randomly grown decision trees, fits each to a bootstrapped subsample of the training set, averages their output, and as the magicians say, walla! We have our forecast.
+
+Abstractly, the machine learns by seeing many examples of the same thing from different angles, memorizing its characteristics, and then generalizing its experience to novel examples in the real world. It is shown a cow eating grass and it is told, "This is a cow". Then it is shown a cow drinking water, nursing its young, or swatting flies from its buttocks -- at each instance, it is told, "This is a cow". With enough training, a bit of luck, and a meek data scientist standing in its corner, the machine can realze the dreams of Pinnochio and Ariel, be where the people are -- out in the real world. Then, when it comes upon a four legged, black and white spotted beast, with a fat pink bladder suspended from its belly, it can walk up to it confidently and declare, "This is a cow."
+
+<h4>Measuring our success</h4>
+
+Can we predict air pollution values in Beijing? Yes. Can we do it well? That question has a more detailed answer. When we build our model, we are trying to both minimize the per estimate error and explain as much of the variance in the data set as possible. These metrics are defined mathematically, and in the first case can be understood as the average distance ("in mathematical space") from our guess to the actual value. In the second case, we are trying to maximize what is called "R-squared", which is a measure of correlation between the predictor values (i.e. weather) and the predicted (pollution). In a simplistic sense, this asks how does pollution move when weather moves? If wind speed increases, but pollution just sits there unchanged, we might have a low value for "R-squared".
+
+So how well did the model perform?
+
+<h4>Wherefore doth our error lie?</h4>
+
+
+
+What kinds of things are responsible for the errors? How can the model be improved? 
+
+There are many reasons for why this model is not perfect. In machine learning applications, the error in your guess -- which can be defined in many ways, but which of often defined as your average error across all guesses, is a composition of error in your model plus something called random noise. 
+
+The error in your model is what can theoretically be improved upon. In the case of this model, for example, that would be insufficient data sources, erroneous data, or irrelevant data masquerading as useful data.
+
+<ul>
+	Errors of precision
+	<li>
+	We are collecting pollution values at the US Embassy in the Chaoyang district in Beijing, but we are collecting weather data from the Airport, which is some number of KM to the north. 
+	</li>
+	<li>
+	Since we are only collecting weather data and pollution data from two single points, we are at the mercy of whatever inacceuracies they have in <emphasis>their</emphasis> data.
+	</li>	
+</ul>
+
+Weatherman error, random noise
+
+<h4>What's next?</h4>
+
+Currently, IBM is building a pollution forecaster that I'm sure will be amazing. They are said to be including not only weather data, but also data on traffic congestion and factory output (please email me if you know where to get this data).
+
+
 
 I am no climate scientist. I’m not even, (cry), a data scientist. But I did live in Beijing, China for four years and I did see the sky darken and the buildings disappear, and I did wear a mask when I rode my bike, and no, I don’t smoke cigarettes. Pollution is a killer problem — really, it does. How fast will it kill you? That is also an interesting statistical question. According to some reports (need attribution), every year in a city like Beijing leads to a 5-6 day loss in life. Of course, this is not an informative statistic, which leads to our first lesson: the paucity of means. 
 
@@ -41,14 +103,12 @@ Well, I can tell you when it would be useful, since I used to use something simi
 
 Again, it is not so easily done. But it gave me an opportunity to explore a problem that used to be quite important to me (I don’t live in Beijing anymore) and allowed me to dive into statistics and machine learning and pro-human hacking, which is a neat thing.
 
-<h4>The data</h4>
 
-The data for this problem is of two kinds, bisected temporally:
+Appendix:
 
-+-------------------------+---------------------------+
-| Historical Weather Data | Historical Pollution Data |
-+-------------------------+---------------------------+
-| Future Weather Data     | Future Pollution Data     |
-+-------------------------+---------------------------+
+What is a decision tree?
 
-In order to build a model that predicts future pollution values, we need to first show the model a lot of examples of past pollution data alongside contemporary (or perhaps, lagged) weather values, so that in the future, the model might meet something it has seen before and say, "Hey! I know that guy. He's a 77".  
+In the specific learning model adapted here, that can be considered from a few different perspectives -- in the world of random foress -- those are called node purity and "importance". Node purity is pretty straightforward. The decision trees that make up our random forest arrive at their conclusions by asking the data a series of questions, and then moving the point down one branch or another based on its answer. Not unlike the parlor game 50 questions, it might ask: is your wind speed greater than 10 mph? If so, go left -- else, go right. It continues to ask this question until it can go no further -- it reaches a "terminal node" or leaf. When all the data has been hung on the leaves of the tree, each leaf is inspected to see how alike are those data points that wound up there. If they are all very alike, we consider the node to be pure, then scratch the model under the chin and say, good job.
+
+The other measure, "importance", is also quite intuitive. It is a measure of how much worse the model would have performed had we taken out a certain predictor.
+
