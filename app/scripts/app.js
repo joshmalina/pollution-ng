@@ -13,7 +13,8 @@ angular
     'ngCookies',
     'ngResource',
     'ngRoute',
-    'angular-loading-bar'
+    'angular-loading-bar',
+    'n3-line-chart'
   ])
   .config(function ($routeProvider, $httpProvider) {
     $routeProvider

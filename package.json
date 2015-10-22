@@ -37,6 +37,8 @@
     "test": "grunt test"
   },
   "dependencies": {
-    "angular-loading-bar": "^0.8.0"
+    "angular-loading-bar": "^0.8.0",
+    "express": "^4.13.3",
+    "gzippo": "^0.2.0"
   }
 }

@@ -78,7 +78,17 @@ One additional layer of complexity is the "random" part of our random forest. Th
 So how did we do? Is the model any good, or just another <a href="http://www.catsthatlooklikehitler.com/">pointless website</a> taking up space on the internet? In our effort to make predictions, we are trying to build a model that performs well on our training data, but not so well that it merely "memorizes" it instead of "learning" from it -- this is a subtle distinction, but one worth considering. If it was only memorization that occured, it will be impossible to generalize to new observations. It would be like getting an advance copy of the final exam of some class, studying it, and performing well on an exam<sup>1</sup>. That is not learning.
 </p>
 
-Let's first consider some tree diagnostics. How pure were our nodes?
+<p>
+Let's first consider some tree diagnostics. There are many ways to evaluate the effectiveness of your model. In our case, the proof will be in the pudding. And since the real world environment is not actually mirrored in our test data set (more on that later), we can only use these diagnostics as an approximation.</p>
+
+<p>
+For our random forest, our test R-squared was 0.78 -- not bad, considering it only goes up to 1.00. What exactly does this mean? Well the R-squared, or <a href="https://en.wikipedia.org/wiki/Coefficient_of_determination">coefficient of determination</a> is a measure of how much of the data set's variability is caputured by the model. As the target variable (in this case pollution) changes, does our model change with it. Or does the data set move in ways that is not always captured by our random forest. According to Rsquared, our model did this nearly 80 percent of the time.</p>
+
+<p>
+Another measure, perhaps even more relevant, is the average error, or Root Mean Squared Error. In our case that was about 41. 41? Well, in our pollution model, we are normally off by about 41. Given that pollution ranges from about 10 to 500, and normally sits at 100 in Beijing, this is not that great. The difference between a good weather day and a moderate weather day could be those 41 points. So we should expect the model to not always be perfect.
+
+
+How pure were our nodes?
 
 Can we predict air pollution values in Beijing? Yes. Can we do it well? That question has a more detailed answer. When we build our model, we are trying to both minimize the per estimate error and explain as much of the variance in the data set as possible. These metrics are defined mathematically, and in the first case can be understood as the average distance ("in mathematical space") from our guess to the actual value. In the second case, we are trying to maximize what is called "R-squared", which is a measure of correlation between the predictor values (i.e. weather) and the predicted (pollution). In a simplistic sense, this asks how does pollution move when weather moves? If wind speed increases, but pollution just sits there unchanged, we might have a low value for "R-squared".
 
