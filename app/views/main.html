@@ -3,11 +3,14 @@
 <!--div linear-chart chart-data="predPromise"></div-->
 
 <!--linechart data="predictions" options="options" mode="" width="" height=""></linechart-->
-<h3 class="text-center">Pollution for the next 10 days</h3>
-<linechart data="data" options="options" mode="" width="700" height="500"></linechart>
+
+<div ng-if="data">
+  <h3 class="text-center">Beijing pollution for the next 10 days</h3>
+  <linechart ng-if="data" data="data" options="options" mode="" width="" height="500"></linechart>
+</div>
 
 
-<h4 ng-hide="predictions" class="text-center">{{until}}</h4>
+<h4 ng-hide="predictions" class="text-center">Rubbing crystal ball ...</h4>
 
 
 <table class="table table-bordered table-condensed" ng-if="predictions">
@@ -20,7 +23,7 @@
   <tbody>
     <tr ng-repeat="obj in predictions">
       <td>{{obj.t}}</td>
-      <td>{{obj.p}}</td>
+      <td>{{obj.p | number:0}}</td>
     </tr>
   </tbody>
 </table>

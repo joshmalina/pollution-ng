@@ -8,49 +8,68 @@
  * Controller of the pollutionNgApp
  */
  angular.module('pollutionNgApp')
- .controller('MainCtrl', ['$http', '$scope', function ($http, $scope) {
+ .controller('MainCtrl', ['$scope', 'pollutionAPI', '$cookies', 'moment', function ($scope, pollutionAPI, $cookies, moment) { 
 
- 	var url = 'http://ec2-52-91-186-157.compute-1.amazonaws.com/forecast'
- 	var local = 'http://127.0.0.1:5000/forecast'
+ 	Date.prototype.addHours = function(h){
+    	this.setHours(this.getHours()+h);
+    	return this;
+	}	
 
- 	var options = {
- 		method: 'GET',
- 		url: url  		
- 	};
+	var predictions = null;
 
-  	var forecast = $http(options);
+	// return forecast from local storage if cookies hasn't expired (set for 1 hour)
+ 	if($cookies.get('forecast_still_valid') && (typeof localStorage.getItem('forecast') != 'undefined')) {
+ 		predictions = JSON.parse(localStorage.getItem('forecast'));
+ 		$scope.predictions = predictions;
+ 		$scope.data = prepDataForChart(predictions);
+ 		console.log($scope.data);
+ 	} else {
+ 		// else call api
+ 		pollutionAPI.get_forecast({useLocalAPI: true}).then(function(values) {
+ 			var predictions = values.data.predictions;
+ 			// pass to view
+ 			$scope.predictions = predictions;
+ 			// set a cookie for an hour
+ 			$cookies.put('forecast_still_valid', true, {expires: new Date().addHours(1)})
+ 			// update local storage of forecast
+ 			localStorage.setItem('forecast', JSON.stringify(predictions));
+ 			// data for chart -- not DRY
+ 			$scope.data = prepDataForChart(predictions);
 
-  	$scope.until = 'Rubbing crystal balls ...'
+ 		})
+ 	}
 
-  	forecast.then(function(vals) {  		
-  		$scope.predictions = vals.data.predictions;
-  		console.log(vals.data.predictions);
-  		localStorage.setItem('polvals', JSON.stringify(vals.data.predictions));  		
-  	})
+ 	function prepDataForChart(data) {
+ 		return data.map(function(each) {
+ 			return {x: data.indexOf(each), pollution: each.p, date: new Date(each.t_raw)}
+ 		}) 		
+ 	}
 
-	// $scope.predictions = JSON.parse(localStorage.getItem('polvals'));
-	// console.log($scope.predictions)
 
-	var data = [];
+ //  		var data = [];
 
-	for(var i = 0; i < $scope.predictions.length; i++) {
-		data[i] = {x:i, pollution:$scope.predictions[i].p}
-	}
+	// for(var i = 0; i < $scope.predictions.length; i++) {
+	// 	data[i] = {x:i, pollution:$scope.predictions[i].p}
+	// }
 
 	
-	$scope.data = data
+	// $scope.data = data
 
-	console.log($scope.data)
+	// console.log($scope.data)		
+
+
+	
 
 	$scope.options = {
 		axes: {
-			x : {key: "x"},
+			x : {key: "date", type:"date"},
 			y: {type:'linear'}
 		},
 		series: [
 			{y: 'pollution', color: "#d62728", thickness: "4px"}
 		],
-		drawDots: true	
+		drawDots: false,
+		zoom: true	
 	}
 
   	// $scope.predPromise = {'o':forecast};
