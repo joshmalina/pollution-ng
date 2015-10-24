@@ -15,19 +15,23 @@ angular.module('pollutionNgApp')
 
   	var options = {
   		method: 'GET',
-  		url: url  		
+  		url: local  		
   	};
 
-  	var forecast = $http(options);
+  	// var forecast = $http(options);
 
-  	$scope.until = 'Rubbing crystal balls ...'
+  	// $scope.until = 'Rubbing crystal balls ...'
 
-  	forecast.then(function(vals) {  		
-  		$scope.predictions = vals.data.predictions
-  		console.log(vals.data.predictions)
-  	})
+  	// forecast.then(function(vals) {  		
+  	// 	$scope.predictions = vals.data.predictions;
+  	// 	console.log(vals.data.predictions);
+  	// 	localStorage.setItem('polvals', JSON.stringify(vals.data.predictions));  		
+  	// })
 
-  	$scope.predPromise = {'o':forecast};
+  	$scope.predictions = JSON.parse(localStorage.getItem('polvals'));
+  	console.log($scope.predictions)
+
+  	// $scope.predPromise = {'o':forecast};
 
     this.awesomeThings = [
       'HTML5 Boilerplate',

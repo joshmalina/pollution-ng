@@ -2,66 +2,57 @@
 
 <p class="lead">Understand the learning model used, motivation for the task, and what the data looks like</p>
 
-<h2>Why forecast pollution?</h2>
-
 <p>
-Air pollution in China is serious business. The average particulate count in Beijing is about <a href="http://www.who.int/mediacentre/factsheets/fs313/en/">double</a> what the World Health Organization considers healthy. Prolonged exposure is correlated with heart and lung disease and stroke. The air is often so polluted that the blue of the sky is literally invisible, buildings are hidden, and on very bad days, outdoor school activities are cancelled and people are encouraged to stay inside.
+Air pollution in China is a serious problem affecting the environment, public health, and even political stability. The average air quality in the capital Beijing is roughly <a href="http://www.who.int/mediacentre/factsheets/fs313/en/">twice</a> the maximum considered healthy by the World Health Organization. Prolonged exposure is associated with heart disease, lung cancer and stroke.
 </p>
 
-<p>So how will forecasting pollution ten days in advance help? Mostly, it won't. For me, the impetus to start the project was to solve a personal problem. When I lived in Beijing, I would only run outside if the pollution index was below 100, and I would run without a mask on if it was below 50. But I couldn't plan around it. If there was someway to know in advance,  I wouldn't even wear a mask. But I couldn't plan to exercise -- just respond when the air cleared up. As it turns out, <a href="http://banshirne.com">someone</a> had already started working on a solution. I've decided to take it a step further, and learn some neat machine learning tools along the way.</p>
+<p>This project attempts to forecast 10 days of houlry pollution estimates in Beijing. While it does nothing to mitigate the problem of toxic air for the city's more than <a href="https://en.wikipedia.org/wiki/Beijing">20 million</a> residents, it may increase awareness, and more importantly, may permit them to schedule their outside time to minimize exposure. When I lived in Beijing, I used <a href="http://banshirne.com">a similar tool</a> to exercise outside without wearing a <a href="http://www.greenpeace.org/eastasia/news/blog/the-three-types-of-masks-that-protect-you-fro/blog/38232/">mask</a>.
+<br>
+<h2>The data</h2>
 
-<h2>Modelling a time series</h2> 
-
-<p>
-Unlike many introductory problems in statistics, the forecasting of pollution values  is complicated by time. In time series data, a fundamental assumption of the distribution of observations is violated: they are not independent.
-</p>
-
-<p>
-In probability, two events A and B are indepdnent if knowing that A occurs offers no insight into the likelihood of B occuring. That is, my wearing of pajamas and the queen eating a sandwich are independent events because knowing one does not help in knowing the other. Of course, this example is absurd. As we all know, the queen never eats sandwiches. Still, it demonstrates the idea of independence for which the observations in a time series do not abide.</p>
-
-<p>
-In our case, knowing the particulate count at 2 p.m. bears on our knowing the number of particles at 3 p.m. Absent a terribly foreful wind, many of those particles will still be in the air an hour later -- there is a correlation across our inputs. Therefore, in order to accurately predict what happens at time t = 0, we can't just rely on external predictors (the weather, traffic patterns) -- we must also consider what the pollution count was at t = -1, t = - 2, and so on.</p>
-
-<h2>Sources of data</h2>
-
-<p>There are roughly four kinds of data involved in this puzzle, three of which will be given to us. They are:</p>
+<p class="lead">There were roughly four kinds of data involved in this puzzle:</p>
 
 <table class="table table-condensed table-bordered">
 	<thead>
 	<tr>
-		<td>1</td><td>Historical Weather Data</td><td>Compiled from the Wunderground API</td>
+		<th>#</th>
+		<th>Data</th>
+		<th>Origin</th>
 	</tr>
 	<tr>
-		<td>2</td><td>Future Weather Data</td><td>Also available from Wunderground, as part of their 10-day forecast</td>
+		<td>1</td><td>Historical Weather</td><td>Compiled hourly from the <a href="http://www.wunderground.com/weather/api/">Wunderground API</a></td>
 	</tr>
 	<tr>
-		<td>3</td><td>Historical Pollution Data</td><td>Collected and posted by the US Embassy in Beijing</td>
+		<td>2</td><td>Future Weather</td><td>Also available from Wunderground, as part of their 10-day forecast</td>
+	</tr>
+	<tr>
+		<td>3</td><td>Historical Pollution</td><td>Collected and posted by the <a href="http://www.stateair.net/web/historical/1/1.html">US Embassy in Beijing</a></td>
 	</tr>
 	<tr>	
-		<td>4</td><td>Future Pollution Data</td><td>Our task to come up with</td>
+		<td>4</td><td>Future Pollution</td><td>Our task to come up with</td>
 	</tr>	
 	</thead>
 </table>
 
-<p>The important features of the weather data included wind speed, wind direction, humidity, air pressure, and temperature. The historical data is provided hourly by Wunderground, but for each call of the API, only one day of values is returned. Thus, it required a fair bit of scripting to <a href="https://github.com/joshmalina/pollution/blob/master/notebooks/Build_historical_weather_data.ipynb">cull, clean and put together</a>. Their 10 day forecast is a bit easier to work with. </p>
+<p>Each call to the Wunderground API exposed only 24 hours of weather data. With eight years of pollution data available as batch csv files from the embassy, this <a href="https://github.com/joshmalina/pollution/blob/master/notebooks/Build_historical_weather_data.ipynb">required hundreds of calls to Wunderground, as well as a fair bit of cleaning, massging and joining</a>.</p>
 
+<p>A bit of early discovery revealed that correlated features might be wind speed, humidity and air pressure</p>
+
+
+The important features of the weather data included wind speed, wind direction, humidity, air pressure, and temperature. These features needed to be joined to the corresponding (in time) pollution values, and one massive data set created from their merger.
 <p>
-The historical pollution data, more easily accessed, can be found on the <a href="http://www.stateair.net/web/historical/1/1.html">website</a> of the US Embassy in Beijing -- which maintains an hourly reading of pollution levels going back eight years -- and you can download an entire year's worth of data at time</p>
 
-<p>The last piece of the puzzle -- future pollution -- was of course, the task at hand. More on that in the next section</p>
+IMG OF SOME PAIRWISE CORRELATION
 
 <h2>Learning from data</h2>
 
 <p>
-After joining the historical weather data with their respective historical pollution values, it was time to do teach the machine to learn. This process is not unlike teaching a human child.</p>
+A machine learning process is not unlike teaching a child. It learns by seeing many examples of the same thing, memorizing its characteristics, and then generalizing its experience to novel examples. In our <a href="https://en.wikipedia.org/wiki/Supervised_learning">supervised learning</a> task, the machine is shown a thing and told, "This is some thing." For example, the computer might be shown a cow feeding and told, "This is a cow". Then it is shown a cow drinking water, nursing its young, or swatting flies from its buttocks -- and at each instance, it is again told, "This is a cow". With a large enough sample of diverse examples (so that it reflects the variety of cows in the population), the machine can correctly label unlabeled observations. Not unlike a wooden Pinnochio suddenly turned real, or a shimmering Ariel now joining the ranks of the bipedal, the machine can confidently saunter up to a four legged spotted beast, with a swollen pink bladder suspended from its belly, and confidently declare, "This is a cow."</p>
 
 <p>
-The machine learns by seeing many examples of the same thing, memorizing its characteristics, and then generalizing its experience to novel examples in the real world. In the simplest case of machine learning, known as <a href="https://en.wikipedia.org/wiki/Supervised_learning">supervised learning</a>it is shown a thing and then told, "This is that thing." Shown a cow eating, it is told, "This is a cow". Shown a cow drinking water, nursing its young, or swatting flies from its buttocks -- and at each instance, it is again told, "This is a cow". With enough diverse examples and a bit of luck, the machine can realize the dreams of Pinnochio and Ariel: to be where the people are, out in the real world. Then, when it comes upon a four legged, black and white spotted beast, with a fat pink bladder suspended from its belly, it can approach it confidently and declare, "This is a cow."</p>
+In actuality, the machine arrives at a mathematical function of finely tuned weights that enable it to apply a class label or numeric value to a new vector of features. After decisiding that the relationship between features and their target was not linear, I decided to grow an ensemble of bootstrapped decision trees whose features were also randomly selected, known as a <a href="https://en.wikipedia.org/wiki/Random_forest">random forest</a>. The general structure of a decision tree:</p>  
 
-<p>
-Metaphors aside, we need our machine to create a mathematical function that is finely tuned to the labeling of pollution data with numerical values. How is this accomplished? For this task, I chose to use an ensemble of randomly grown decision trees, known in the machine learning literature as a <a href="https://en.wikipedia.org/wiki/Random_forest">random forest</a>. The decision tree is quite intuitive. An example of one is shown below:</p>  
-
-<img src="/images/tree_example.png" class="img-responsive">
+<img src="/images/tree_example.png" class="img-responsive"><label>A decision tree</label>
 
 <p>
 Basically, moving from top to bottom, the tree asks our row of data a series of questions. In this tree, it first asks: "Is your humidity less than 43.5? If so, go left. Else, go right." It continues to interrogate the row of data until it reaches a "terminal node", or leaf, where it must await the rest of the data set to move through the tree. Upon conclusion, the algorithm analyzes the constituents of each leaf, and assigns a numerical value (in our case) to all future values that might arrive there. </p>
@@ -71,6 +62,20 @@ One tree alone is not sufficient for correctly labeling unseen (future) data poi
 
 <p>
 One additional layer of complexity is the "random" part of our random forest. This means that all the trees in our forest are not created equal. In random forest construction, each three is grown with only a randomly selected subset of the available predictors (that is, maybe Tree 1 is grown using the variables windspeed and humidity, whereas Tree 2 is grown using temperature and air pressure). By preserving some variety in our forest, our final product is even better suited to correctly classifying new observations.</p>
+
+<h2>Modelling a time series</h2> 
+
+<p>
+As a time series,  the time  The hourly observation of pollution values the forecasting of pollution values  is complicated by time. In time series data, a fundamental assumption of the distribution of observations is violated: they are not independent.
+</p>
+
+<p>
+In probability, two events A and B are indepdnent if knowing that A occurs offers no insight into the likelihood of B occuring. That is, my wearing of pajamas and the queen eating a sandwich are independent events because knowing one does not help in knowing the other. Of course, this example is absurd. As we all know, the queen never eats sandwiches. Still, it demonstrates the idea of independence for which the observations in a time series do not abide.</p>
+
+<p>
+In our case, knowing the particulate count at 2 p.m. bears on our knowing the number of particles at 3 p.m. Absent a terribly foreful wind, many of those particles will still be in the air an hour later -- there is a correlation across our inputs. Therefore, in order to accurately predict what happens at time t = 0, we can't just rely on external predictors (the weather, traffic patterns) -- we must also consider what the pollution count was at t = -1, t = - 2, and so on.</p>
+
+<img src="/images/timeseries.png" class="img-responsive"><label>Pollution over the course of eight years in Beijing. The average is about 100, whereas 50 is the maximum that is considered healthy by the World Health Organization.</label>
 
 <h2>Measuring success</h2>
 
@@ -158,6 +163,8 @@ Hastie, et al. An introduction to statistical learning. http://www-bcf.usc.edu/~
 	<li>Wunderground API</li>
 </ol>
 
+
+1 For selfish reasons, though, I really just wanted to play with some machine learning algorithms. 
 
 Appendix:
 
