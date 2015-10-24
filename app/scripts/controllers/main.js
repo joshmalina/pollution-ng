@@ -25,7 +25,7 @@
  		console.log($scope.data);
  	} else {
  		// else call api
- 		pollutionAPI.get_forecast({useLocalAPI: true}).then(function(values) {
+ 		pollutionAPI.get_forecast({useLocalAPI: false}).then(function(values) {
  			var predictions = values.data.predictions;
  			// pass to view
  			$scope.predictions = predictions;
@@ -46,20 +46,6 @@
  	}
 
 
- //  		var data = [];
-
-	// for(var i = 0; i < $scope.predictions.length; i++) {
-	// 	data[i] = {x:i, pollution:$scope.predictions[i].p}
-	// }
-
-	
-	// $scope.data = data
-
-	// console.log($scope.data)		
-
-
-	
-
 	$scope.options = {
 		axes: {
 			x : {key: "date", type:"date"},
@@ -71,8 +57,6 @@
 		drawDots: false,
 		zoom: true	
 	}
-
-  	// $scope.predPromise = {'o':forecast};
 
 
   
