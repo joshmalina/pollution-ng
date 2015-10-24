@@ -15,7 +15,7 @@
 
  	var options = {
  		method: 'GET',
- 		url: local  		
+ 		url: url  		
  	};
 
   	var forecast = $http(options);
