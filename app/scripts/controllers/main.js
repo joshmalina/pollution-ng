@@ -7,16 +7,16 @@
  * # MainCtrl
  * Controller of the pollutionNgApp
  */
-angular.module('pollutionNgApp')
-  .controller('MainCtrl', ['$http', '$scope', function ($http, $scope) {
+ angular.module('pollutionNgApp')
+ .controller('MainCtrl', ['$http', '$scope', function ($http, $scope) {
 
-  	var url = 'http://ec2-52-91-186-157.compute-1.amazonaws.com/forecast'
-  	var local = 'http://127.0.0.1:5000/forecast'
+ 	var url = 'http://ec2-52-91-186-157.compute-1.amazonaws.com/forecast'
+ 	var local = 'http://127.0.0.1:5000/forecast'
 
-  	var options = {
-  		method: 'GET',
-  		url: local  		
-  	};
+ 	var options = {
+ 		method: 'GET',
+ 		url: local  		
+ 	};
 
   	// var forecast = $http(options);
 
@@ -28,28 +28,38 @@ angular.module('pollutionNgApp')
   	// 	localStorage.setItem('polvals', JSON.stringify(vals.data.predictions));  		
   	// })
 
-  	$scope.predictions = JSON.parse(localStorage.getItem('polvals'));
-  	console.log($scope.predictions)
+	$scope.predictions = JSON.parse(localStorage.getItem('polvals'));
+	console.log($scope.predictions)
+
+	var data = [];
+
+	for(var i = 0; i < $scope.predictions.length; i++) {
+		data[i] = {x:i, pollution:$scope.predictions[i].p}
+	}
+
+	
+	$scope.data = data
+
+	console.log($scope.data)
+
+	$scope.options = {
+		axes: {
+			x : {key: "x"},
+			y: {type:'linear'}
+		},
+		series: [
+			{y: 'pollution', color: "#d62728", thickness: "4px"}
+		],
+		drawDots: true	
+	}
 
   	// $scope.predPromise = {'o':forecast};
 
-    this.awesomeThings = [
-      'HTML5 Boilerplate',
-      'AngularJS',
-      'Karma'
-    ];
 
-    $scope.options = {
-    	axes: {
-    		x: {type: 'linear', min:0, max:241},
-    		y: {type: 'linear', min: 0, max: 500}//,
-    	},
-    	series: [
-    		{y: 'p'}
-  		],
-  		lineMode: 'linear'
-    }
+  
 
 
-    
+
+
+
   }]);

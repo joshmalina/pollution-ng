@@ -14,7 +14,8 @@ angular
     'ngResource',
     'ngRoute',
     'angular-loading-bar',
-    'n3-line-chart'
+    'n3-line-chart',
+    'googlechart'
   ])
   .config(function ($routeProvider, $httpProvider) {
     $routeProvider
