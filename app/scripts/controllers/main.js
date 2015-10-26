@@ -22,10 +22,11 @@
  		predictions = JSON.parse(localStorage.getItem('forecast'));
  		$scope.predictions = predictions;
  		$scope.data = prepDataForChart(predictions);
- 		console.log($scope.data);
+ 		//console.log($scope.data);
+ 		console.log($scope.predictions);
  	} else {
  		// else call api
- 		pollutionAPI.get_forecast({useLocalAPI: false}).then(function(values) {
+ 		pollutionAPI.get_forecast({useLocalAPI: true}).then(function(values) {
  			var predictions = values.data.predictions;
  			// pass to view
  			$scope.predictions = predictions;
@@ -35,6 +36,7 @@
  			localStorage.setItem('forecast', JSON.stringify(predictions));
  			// data for chart -- not DRY
  			$scope.data = prepDataForChart(predictions);
+ 			console.log(values.data)
 
  		})
  	}
