@@ -46,7 +46,7 @@ The machine learning process is not so different from educating a child. It lear
 <p>
 Less figuratively, that final success is the output of an algorithmically tuned function of weights (one or more for each of the relevant predictors) that enables the machine to apply a label or number to a new input. The machine starts with a naive or randomly selected set of weights, which move in one direction or another depending on how the model is built. In this case, I've used an ensemble of bootstrapped decision trees whose features were also randomly selected, known as a <a href="https://en.wikipedia.org/wiki/Random_forest">random forest</a> to make predictions for the count (or density) of air pollution. It was a good fit for my problem because it was a flexible learning model that wasn't as resistant to high leverage points as a linear (or sort of linear) system. It also didn't require too much fine tuning. 
 
-<img src="/images/tree_example.png" class="img-responsive"><label>A decision tree</label>
+<img src="/images/tree_example.png" class="img-responsive"><label>A decision tree classifies vectors of features according to a series of conditions. Each input continues down the tree until arriving at a terminal node, where it waits for the rest of the data set to be processed. Upon completion, either a label or numeric value is assigned to all observations within and any new observations that happen down the same path.</label>
 
 <p>
 A decision tree is a learning model that sorts inputs into a set of terminal nodes (or leaves), where each observation is assigned to a predictive class or value. The tree sorts by "asking" the data a series of yes-no questions. From root to leaf: "Is humidity less than 43.5? If so, go left. Else, go right." Once all inputs are placed in a terminal node, a classification scheme or regression pattern will assign a value to that input and to all future inputs that arrive in the same node. </p>
@@ -78,18 +78,25 @@ So how did we do? Is the model any good, or just another <a href="http://www.cat
 
 <h4>Sources of error and improvement</h4>
 
-There are many reasons for why this model is not perfect. In machine learning applications, the error out of sample is a composition of error (which is itself a composition of bias and variance) in your model plus random noise, which is the sort of unexplained variation in a data set that is not captured causally. 
+<p>
+There are many reasons for why this model is not perfect. In machine learning applications, the error out of sample is a composition of error (which is itself a composition of bias and variance) in your model plus random noise, which is the sort of unexplained variation in a data set that is not captured causally. </p>
 
-For data precision, it might have been a concern that the weather data and pollution data are not captured in exactly the same place in Beijing. Pollution data is reported from the US Embassy, whereas weather comes from a station at the Beijing Airport, which is about 12 miles away. Given the fluctuation in pollution readings across even short distances, this could be a concern for the integrity of the data set. A way to mitigate this effect would be to incorporate data from many pollution and weather sensors throughout the city and approximate an average for the city. 
+<p>
+For data precision, it might have been a concern that the weather data and pollution data are not captured in exactly the same place in Beijing. Pollution data is reported from the US Embassy, whereas weather comes from a station at the Beijing Airport, which is about 12 miles away. Given the fluctuation in pollution readings across even short distances, this could be a concern for the integrity of the data set. A way to mitigate this effect would be to incorporate data from many pollution and weather sensors throughout the city and approximate an average for the city. </p>
 
-Potentially even more important would be the inclusion of other variables, such as traffic patterns and variation in industrial output, which may be correlated with our target. If anyone reading this has access to that data, I would be very interested in incorporating it. 
+<p>
+Potentially even more important would be the inclusion of other variables, such as traffic patterns and variation in industrial output, which may be correlated with our target. If anyone reading this has access to that data, I would be very interested in incorporating it. </p>
 
-Of course, we are also limited by the ability of meteorologists to make accurate forecasts, since our predictions are so heavily dependent on weather. This is not really an area where we can improve.
+<p>
+Of course, we are also limited by the ability of meteorologists to make accurate forecasts, since our predictions are so heavily dependent on weather. This is not really an area where we can improve.</p>
+<p>
+Outside areas of error, our application could be improved in a couple important ways.</p>
 
-Outside areas of error, our application could be improved in a couple important ways.
-
-1. Per hour error could be calculate to show prediction error as a function of time
-2. Visualizations could be improved
+<ol>
+<li>
+Per hour error could be calculate to show prediction error as a function of time</li>
+<li>Visualizations could be improved</li>
+</ol>
 
 <h2>Sources</h2>
 <p class="lead">The following authors and their books and course materials either directly inspired or helped me to understand or implement these learning methods</p>
