@@ -26,7 +26,7 @@
  		console.log($scope.predictions);
  	} else {
  		// else call api
- 		pollutionAPI.get_forecast({useLocalAPI: true}).then(function(values) {
+ 		pollutionAPI.get_forecast({useLocalAPI: false}).then(function(values) {
  			var predictions = values.data.predictions;
  			// pass to view
  			$scope.predictions = predictions;
@@ -39,7 +39,7 @@
  			console.log(values.data)
 
  		})
- 	}
+ 	}	
 
  	function prepDataForChart(data) {
  		return data.map(function(each) {

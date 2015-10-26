@@ -3,10 +3,10 @@
 <p class="lead">Understand the learning model used, motivation for the task, and what the data looks like</p>
 
 <p>
-Air pollution in China is a grave concern for the enironmental and public health of the country. The air quality in the capital is on average <a href="http://www.who.int/mediacentre/factsheets/fs313/en/">twice</a> what is considered healthy by the World Health Organization. Prolonged exposure to air pollution at the level experience in Beijing is associated with heart disease, lung cancer and stroke.
+Air pollution in China is a grave concern for the environmental and public health of the country. The air quality in the capital is on average <a href="http://www.who.int/mediacentre/factsheets/fs313/en/">twice</a> what is considered healthy by the World Health Organization. Prolonged exposure to air pollution at the level experienced in Beijing is associated with heart disease, lung cancer and stroke.
 </p>
 
-<p>This project forecasts 10 days of hourly particulate estimates in Beijing based on historial pollution and weather records. It will not mitigate the problem of toxic air for the city's more than <a href="https://en.wikipedia.org/wiki/Beijing">20 million</a> residents, but it may allow them to minize their exposure on very bad days outside. When I lived in Beijing, I used <a href="http://banshirne.com">a similar tool</a> to exercise outside without wearing a <a href="http://www.greenpeace.org/eastasia/news/blog/the-three-types-of-masks-that-protect-you-fro/blog/38232/">mask</a>.
+<p>This project forecasts 10 days of hourly particulate estimates in Beijing based on historical pollution and weather records. While it will not mitigate the problem of toxic air for the city's more than <a href="https://en.wikipedia.org/wiki/Beijing">20 million</a> residents, it may allow them to manage their exposure to very bad (or good) air a few days in advance. When I lived in Beijing, I used <a href="http://banshirne.com">a similar tool</a> to exercise outside without wearing a <a href="http://www.greenpeace.org/eastasia/news/blog/the-three-types-of-masks-that-protect-you-fro/blog/38232/">mask</a>.
 <br>
 <h2>The data</h2>
 
@@ -34,110 +34,65 @@ Air pollution in China is a grave concern for the enironmental and public health
 	</thead>
 </table>
 
-<p>Each call to the Wunderground API exposed only 24 hours of weather data. With eight years of pollution data available as batch csv files from the embassy, this <a href="https://github.com/joshmalina/pollution/blob/master/notebooks/Build_historical_weather_data.ipynb">required hundreds of calls to Wunderground, as well as a fair bit of cleaning, massging and joining</a>.</p>
+<p>Each call to the Wunderground API exposed only 24 hours of weather data. With eight years of pollution data waiting to be matched, this <a href="https://github.com/joshmalina/pollution/blob/master/notebooks/Build_historical_weather_data.ipynb">required hundreds of calls to Wunderground, as well as a fair bit of cleaning, massaging and joining</a>.</p>
 
-<p>Early exploration of the data set revealed that weather factors such as wind speed, humidity and air pressure were correlated with changes in particulate density, but were also correlated with each other. Seasonal trends in pollution values (from earlier research), and the fact that the data were part of a time series ruled out a simple linear model. Pollution values themselves were not normally distributed, and extreme points distributed widely outside a few standard deviations of the mean were not uncommon.</p>
+<p>Early exploration of the data set revealed that weather factors such as wind speed, humidity and air pressure were correlated with changes in particulate density, but were also correlated with each other. Seasonal trends in pollution values (from earlier research), and the fact that the data were part of a time series pointed toward a more flexible model. Early linear approximations performed poorly out of sample. Pollution values themselves were not normally distributed, and extreme points distributed widely outside a few standard deviations of the mean were not uncommon.</p>
 
 <h2>How do machines learn?</h2>
 
 <p>
-A machine is taught not unlike a child. It learns by exposure to diverse examples, by memorizing their characteristics, and generalizing its experience to novel observations. In a <a href="https://en.wikipedia.org/wiki/Supervised_learning">supervised learning</a> task such as ours, the machine is shown a bit of data and told, "This is some thing." It could be shown a cow feeding and told, "This is a cow". Then a different cow drinking water, nursing its young, or swatting flies from its buttocks -- and at each instance, again, "This is a cow". With enough observations and an implicit truth to be learned, the machine can correctly label new instances. Not unlike an anxious Pinnochio suddenly turned real, or a shimmering Ariel now walking amongst the ranks of the bipedal, the machine can meet a four legged spotted beast with a swollen pink bladder and an appetite for grass, and correctly decalre it a cow.</p>
+The machine learning process is not so different from educating a child. It learns by exposure to diverse examples, by memorizing their characteristics, and generalizing its experience to novel observations. In a <a href="https://en.wikipedia.org/wiki/Supervised_learning">supervised learning</a> task such as ours, the machine is shown a bit of data and told, "This is some thing." It could be shown a cow feeding and told, "This is a cow". Then a different cow drinking water, nursing its young, or swatting flies from its buttocks -- and at each instance, again, "This is a cow". With enough observations and an actual pattern to be learned (this is necessary), the machine may correctly label new instances. Not unlike an anxious Pinocchio suddenly turned real, or a shimmering Ariel now walking amongst the ranks of the bipedal, the machine can meet a four legged beast with a swollen pink bladder and confidently declare, "This is a cow."</p>
 
 <p>
-That success is the output of an algorithmically tuned function of weights (one or more for each of the relevant predictors) that enables the machine to apply a label or number to a new input. Here, I've used an ensemble of bootstrapped decision trees whose features were also randomly selected, known as a <a href="https://en.wikipedia.org/wiki/Random_forest">random forest</a> to make predictions for the count (or density) of air pollution. 
+Less figuratively, that final success is the output of an algorithmically tuned function of weights (one or more for each of the relevant predictors) that enables the machine to apply a label or number to a new input. The machine starts with a naive or randomly selected set of weights, which move in one direction or another depending on how the model is built. In this case, I've used an ensemble of bootstrapped decision trees whose features were also randomly selected, known as a <a href="https://en.wikipedia.org/wiki/Random_forest">random forest</a> to make predictions for the count (or density) of air pollution. It was a good fit for my problem because it was a flexible learning model that wasn't as resistant to high leverage points as a linear (or sort of linear) system. It also didn't require too much fine tuning. 
 
 <img src="/images/tree_example.png" class="img-responsive"><label>A decision tree</label>
 
 <p>
-A decision tree is a learning model that sorts out inputs into a set of terminal nodes (or leaves), where it is assigned to a predictive class or value. The tree sorts a data set by distributing its feature vectors in response to a series of questions with boolean responses. From root to leaf, it may be sorted according to questions like: "Is humidity less than 43.5? If so, go left. Else, go right." Once all inputs are placed in a terminal node, a classification scheme or regression pattern will assign a value to that input and to all future inputs that arrive in the same node. </p>
+A decision tree is a learning model that sorts inputs into a set of terminal nodes (or leaves), where each observation is assigned to a predictive class or value. The tree sorts by "asking" the data a series of yes-no questions. From root to leaf: "Is humidity less than 43.5? If so, go left. Else, go right." Once all inputs are placed in a terminal node, a classification scheme or regression pattern will assign a value to that input and to all future inputs that arrive in the same node. </p>
 
 <p>
-A single tree alone is a poor model for generalization. It suffers from high variance -- small changes in inputs can lead to a very different approximation. This "instability" makes it unlikely to perform very well out of sample. Fortunately, if we grow many diverse trees and average their predictions we can lower our variance and thus our error without biasing the model too much. The subsampling is completeled via the process <a href="https://en.wikipedia.org/wiki/Bootstrap_aggregating">bagging.</a></p>
+A single tree alone is a poor model for generalization. It suffers from high variance -- small changes in inputs can lead to a very different approximation. This "instability" makes it unlikely to perform very well out of sample. Fortunately, if we grow many diverse trees and average their predictions we can lower our variance and thus our error without biasing the model too much. The sub-sampling is completed via the process <a href="https://en.wikipedia.org/wiki/Bootstrap_aggregating">bagging.</a></p>
 
 <p>
-The random sampling of the predictors is the random forest part, in which each tree is grown with fewer than p predictors. For example, Tree 1 is grown on windspeed and humidity, whereas Tree 2 is grown using temperature and air pressure. By preserving some variety in our forest, our final product is even better suited to correctly classifying new observations. In the presence of a few highly predictive varibles, this randomness preserves some diversity in tree construction.</p>
+The random sampling of the predictors is the random forest part, in which each tree is grown with fewer than p predictors. For example, Tree 1 is grown on wind speed and humidity, whereas Tree 2 is grown using temperature and air pressure. By preserving some variety in our forest, our final product is even better suited to correctly classifying new observations. In the presence of a few highly predictive variables, this randomness preserves some diversity in tree construction.</p>
+
+<p>
+To get this random forest performing well, it is easy to set a large number of trees (500 or more) and allow it to build to any depth. However, since these results would need to be made available online (and there currently isn't a budget for a multi-node cluster of EC2 instances), it was important to minimize the size of the forest since it would be loaded into memory for the computations. Experimenting with different forest sizes showed that there was little decrease in error after about 100 trees.
+</p>
 
 <h2>A note on time series</h2> 
 
 <p>
-The data in this project exemplify a time series, wherein the pollution values are not independelty selected from a population. Every value is highly correlated with those immediatelly following it and immediately preceding it, allowing us to use previous values as predictors as well, but also complicating our analysis since the observations are not independent. In probability, events A and B are indepdnent if knowing that A occurs offers no insight into the likelihood of B occuring. That is, my wearing of pajamas and the queen eating a sandwich are independent since knowing one does not help in knowing the likelihood of the other.</p>
+The data in this project exemplify a time series, wherein the pollution values are not independently selected from a population. Every value is highly correlated with those immediately following it and immediately preceding it, allowing us to use previous values as predictors as well, but also complicating our analysis since the observations are not independent. In probability, events A and B are independent if knowing that A occurs offers no insight into the likelihood of B occurring. That is, my wearing of pajamas and the queen eating a sandwich are independent since knowing one does not help in knowing the likelihood of the other.</p>
 
 <p>
-Since pollution values do not tend to completely refresh in the course of hour, the particulate count at 2pm is likely still counting those that were around at 3 p.m. Our model is greatly improved by incorporating n - k previous prediction values, but it is important not to overweight its significance -- as the model forecasts further out in time, previous pollution values are merely educated guesses, and so we need to expect a larger degree of error as we get further out. </p>
+Since pollution values do not tend to completely refresh in the course of hour, the particulate count at 2 pm is likely still counting those that were around at 3 p.m. Our model is greatly improved by incorporating n - k previous prediction values, but it is important not to overweight its significance -- as the model forecasts further out in time, previous pollution values are merely educated guesses, and so we need to expect a larger degree of error as we get further out. </p>
 
 <img src="/images/timeseries.png" class="img-responsive"><label>Pollution over the course of eight years in Beijing. The average is about 100, whereas 50 is the maximum that is considered healthy by the World Health Organization.</label>
 
 <h2>Measuring success</h2>
 
 <p>
-So how did we do? Is the model any good, or just another <a href="http://www.catsthatlooklikehitler.com/">pointless website</a> taking up space on the internet? In our effort to make predictions, we are trying to build a model that performs well on our training data, but not so well that it merely "memorizes" it instead of "learning" from it -- this is a subtle distinction, but one worth considering. If it was only memorization that occured, it will be impossible to generalize to new observations. It would be like getting an advance copy of the final exam of some class, studying it, and performing well on an exam<sup>1</sup>. That is not learning.
-</p>
+So how did we do? Is the model any good, or just another <a href="http://www.catsthatlooklikehitler.com/">pointless website</a> taking up space on the internet? Our estimates on a test-set (a fraction of the data where the model was not trained) showed that our model explained nearly 78 percent of the variety in the target output (R-squared). This is a gauge of how our target (pollution) changes when the various weather predictions changed. If there is a strong correspondence, then we would see a higher R-squared. We also had an average error of around 32 (Root mean squared error), and we should expect this to be higher as we get further from the present.</p>
 
-<p>
-Let's first consider some tree diagnostics. There are many ways to evaluate the effectiveness of your model. In our case, the proof will be in the pudding. And since the real world environment is not actually mirrored in our test data set (more on that later), we can only use these diagnostics as an approximation.</p>
+<h4>Sources of error and improvement</h4>
 
-<p>
-For our random forest, our test R-squared was 0.78 -- not bad, considering it only goes up to 1.00. What exactly does this mean? Well the R-squared, or <a href="https://en.wikipedia.org/wiki/Coefficient_of_determination">coefficient of determination</a> is a measure of how much of the data set's variability is caputured by the model. As the target variable (in this case pollution) changes, does our model change with it. Or does the data set move in ways that is not always captured by our random forest. According to Rsquared, our model did this nearly 80 percent of the time.</p>
+There are many reasons for why this model is not perfect. In machine learning applications, the error out of sample is a composition of error (which is itself a composition of bias and variance) in your model plus random noise, which is the sort of unexplained variation in a data set that is not captured causally. 
 
-<p>
-Another measure, perhaps even more relevant, is the average error, or Root Mean Squared Error. In our case that was about 41. 41? Well, in our pollution model, we are normally off by about 41. Given that pollution ranges from about 10 to 500, and normally sits at 100 in Beijing, this is not that great. The difference between a good weather day and a moderate weather day could be those 41 points. So we should expect the model to not always be perfect.
+For data precision, it might have been a concern that the weather data and pollution data are not captured in exactly the same place in Beijing. Pollution data is reported from the US Embassy, whereas weather comes from a station at the Beijing Airport, which is about 12 miles away. Given the fluctuation in pollution readings across even short distances, this could be a concern for the integrity of the data set. A way to mitigate this effect would be to incorporate data from many pollution and weather sensors throughout the city and approximate an average for the city. 
 
+Potentially even more important would be the inclusion of other variables, such as traffic patterns and variation in industrial output, which may be correlated with our target. If anyone reading this has access to that data, I would be very interested in incorporating it. 
 
-How pure were our nodes?
+Of course, we are also limited by the ability of meteorologists to make accurate forecasts, since our predictions are so heavily dependent on weather. This is not really an area where we can improve.
 
-Can we predict air pollution values in Beijing? Yes. Can we do it well? That question has a more detailed answer. When we build our model, we are trying to both minimize the per estimate error and explain as much of the variance in the data set as possible. These metrics are defined mathematically, and in the first case can be understood as the average distance ("in mathematical space") from our guess to the actual value. In the second case, we are trying to maximize what is called "R-squared", which is a measure of correlation between the predictor values (i.e. weather) and the predicted (pollution). In a simplistic sense, this asks how does pollution move when weather moves? If wind speed increases, but pollution just sits there unchanged, we might have a low value for "R-squared".
+Outside areas of error, our application could be improved in a couple important ways.
 
-So how well did the model perform?
-
-<h4>Wherefore doth our error lie?</h4>
-
-
-
-What kinds of things are responsible for the errors? How can the model be improved? 
-
-There are many reasons for why this model is not perfect. In machine learning applications, the error in your guess -- which can be defined in many ways, but which of often defined as your average error across all guesses, is a composition of error in your model plus something called random noise. 
-
-The error in your model is what can theoretically be improved upon. In the case of this model, for example, that would be insufficient data sources, erroneous data, or irrelevant data masquerading as useful data.
-
-<ul>
-	Errors of precision
-	<li>
-	We are collecting pollution values at the US Embassy in the Chaoyang district in Beijing, but we are collecting weather data from the Airport, which is some number of KM to the north. 
-	</li>
-	<li>
-	Since we are only collecting weather data and pollution data from two single points, we are at the mercy of whatever inacceuracies they have in <emphasis>their</emphasis> data.
-	</li>	
-</ul>
-
-Weatherman error, random noise
-
-<h4>What's next?</h4>
-
-Currently, IBM is building a pollution forecaster that I'm sure will be amazing. They are said to be including not only weather data, but also data on traffic congestion and factory output (please email me if you know where to get this data).
-
-
-
-I am no climate scientist. I’m not even, (cry), a data scientist. But I did live in Beijing, China for four years and I did see the sky darken and the buildings disappear, and I did wear a mask when I rode my bike, and no, I don’t smoke cigarettes. Pollution is a killer problem — really, it does. How fast will it kill you? That is also an interesting statistical question. According to some reports (need attribution), every year in a city like Beijing leads to a 5-6 day loss in life. Of course, this is not an informative statistic, which leads to our first lesson: the paucity of means. 
-
-A mean (or average, as the lay people call it) is, roughly:
-
-the sum total of some things / the number of those things.
-
-So, in our case, this would be:
-
-(total time lost to pollution causing death in a population / number of people in the population)
-
-What’s misleading about this statistic is that nobody dies five days early from pollution. That wouldn’t be so bad. When you die from pollution, you die from heart disease, stroke, lung cancer, emphysema, or some other wonderful ailment. And when you die from those, you die 10 years early, or 20 years early. But most people don’t die of those ailments, and so the mean gives you 5 days. 
-
-A better statistic would be the percent increase in those ailments mentioned (heart disease, etc…) from living in a polluted environment. Then you could say: “Alright, living here makes me 20 percent more likely to have a stroke” (get correct number).
-
-So, we’ve established the why — well, sort of. Everyone would agree that health, and therefore pollution, might be an interesting thing to predict — but it’s no so simple. As a matter of fact, predicting pollution values would probably be of great interest to Chinese and foreigners living in Beijing — if you could predict it years into the future. That way, they could decide if they want to stick around, raise a family — they’d be more likely to if they knew the air quality would get better. But that is not at all what I’m doing here. I’m only predicting 10 days in advance — and given the normal human gestation period of 9 months — I’m not sure how relevant the predictions will be.
-
-Well, I can tell you when it would be useful, since I used to use something similar <link_to_smog_cast>, when I lived in Beijing, to schedule my exercise. That app would tell me when the next time it was going to be decent outside, and so I would plan my jogs around it — it was very nice. Now I’ve tried to do the same and a bit more, giving numeric values on the hour, every hour, for ten days in the future.
-
-Again, it is not so easily done. But it gave me an opportunity to explore a problem that used to be quite important to me (I don’t live in Beijing anymore) and allowed me to dive into statistics and machine learning and pro-human hacking, which is a neat thing.
+1. Per hour error could be calculate to show prediction error as a function of time
+2. Visualizations could be improved
 
 <h2>Sources</h2>
+<p class="lead">The following authors and their books and course materials either directly inspired or helped me to understand or implement these learning methods</p>
 
 <ol>
 	<li>
@@ -154,15 +109,10 @@ Hastie, et al. An introduction to statistical learning. http://www-bcf.usc.edu/~
 </ol>
 
 
-1 For selfish reasons, though, I really just wanted to play with some machine learning algorithms. 
+<!-- 
+improvements:
 
-Appendix:
-
-What is a decision tree?
-
-In the specific learning model adapted here, that can be considered from a few different perspectives -- in the world of random foress -- those are called node purity and "importance". Node purity is pretty straightforward. 
-
-The decision trees that make up our random forest arrive at their conclusions by asking the data a series of questions, and then moving the point down one branch or another based on its answer. Not unlike the parlor game 50 questions, it might ask: is your wind speed greater than 10 mph? If so, go left -- else, go right. It continues to ask this question until it can go no further -- it reaches a "terminal node" or leaf. When all the data has been hung on the leaves of the tree, each leaf is inspected to see how alike are those data points that wound up there. If they are all very alike, we consider the node to be pure, then scratch the model under the chin and say, good job.
-
-The other measure, "importance", is also quite intuitive. It is a measure of how much worse the model would have performed had we taken out a certain predictor.
-
+1. add some pairwise correlation images
+2. show the importance table for features of the random forest
+3. show a graph displaying error as a function of trees
+-->
