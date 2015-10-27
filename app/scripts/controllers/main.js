@@ -25,7 +25,7 @@
  		defer.resolve(getPreds)	
  	} else {
  		// else call api
- 		pollutionAPI.get_forecast({useLocalAPI: true}).then(function(values) {
+ 		pollutionAPI.get_forecast({useLocalAPI: false}).then(function(values) {
 
  			var preds = values.data;
  			localStorage.setItem('forecast', JSON.stringify(preds));
@@ -37,16 +37,7 @@
  			// update local storage of forecast
  			console.log(values.data);
  		})
- 	}
-
- 	// predictions.promise.then(function(v) {
- 	// 	$scope.predictions = v;
- 	// })
-
- 	// updatedAt.promise.then(function(at) {
- 	// 	console.log(at)
- 	// 	$scope.updatedAt = new Date(at);
- 	// })
+ 	} 	
 
 	defer.promise.then(function(preds) {
 		$scope.predictions = preds.predictions;

@@ -10,8 +10,9 @@
 angular.module('pollutionNgApp')
   .factory('pollutionAPI', ['$http', function ($http) {
 
-  	var LOCAL_API = 'http://127.0.0.1:5000/forecast';
+  	var LOCAL_API = 'http://127.0.0.1:5000/getLatest';//forecast';
   	var PROD_API = 'http://ec2-52-91-186-157.compute-1.amazonaws.com/forecast';   
+    var PROD_API = 'http://ec2-52-91-103-245.compute-1.amazonaws.com/getLatest';
     
 
     function get_forecast(endpoint) {
