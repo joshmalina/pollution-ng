@@ -4,14 +4,15 @@
 
 <!--linechart data="predictions" options="options" mode="" width="" height=""></linechart-->
 
-<div ng-if="data">
-  <h3 class="text-center">Beijing pollution for the next 10 days</h3>
-  <linechart ng-if="data" data="data" options="options" mode="" width="" height="500"></linechart>
+<div ng-if="predictions" class="jumbotron" style="">
+  <h2 class="text-center">Beijing pollution for the next 10 days</h2><br>
+  <linechart data="predictions" options="options" mode="" width="" height="500"></linechart>
+  <p>Latest: {{currently}} on {{updatedAt | date: 'EEEE, MMM d @ h a'}}</p>
+  <div>All times are China time</div>
 </div>
 
 
 <h4 ng-hide="predictions" class="text-center">Rubbing crystal ball ...</h4>
-
 
 <table class="table table-bordered table-condensed" ng-if="predictions">
   <thead>
@@ -22,8 +23,9 @@
   </thead>
   <tbody>
     <tr ng-repeat="obj in predictions">
-      <td>{{obj.t}}</td>
-      <td>{{obj.p | number:0}}</td>
+      <td>{{obj.date | date: 'EEEE, MMM d @ h a'}}</td>
+      <td>{{obj.pollution | number:0}}</td>
+      <td ng-style="{{changeColor(obj.pollution)}}"></td>
     </tr>
   </tbody>
 </table>
