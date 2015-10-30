@@ -74,9 +74,13 @@ Since pollution values do not tend to completely refresh in the course of hour, 
 <h2>Measuring success</h2>
 
 <p>
-So how did we do? Is the model any good, or just another <a href="http://www.catsthatlooklikehitler.com/">pointless website</a> taking up space on the internet? Our estimates on a test-set (a fraction of the data where the model was not trained) showed that our model explained nearly 78 percent of the variety in the target output (R-squared). This is a gauge of how our target (pollution) changes when the various weather predictions changed. If there is a strong correspondence, then we would see a higher R-squared. We also had an average error of around 32 (Root mean squared error), and we should expect this to be higher as we get further from the present.</p>
+So how did we do? Our estimates on a test-set (a fraction of the data where the model was not trained) showed that our model explained nearly 78 percent of the variety in the target output (R-squared). This is a gauge of how our target (pollution) changes when the various weather predictions changed. If there is a strong correspondence, then we would see a higher R-squared. We also had an average error of around 32 (Root mean squared error), and we should expect this to be higher as we get further from the present.</p>
 
-<h4>Sources of error and improvement</h4>
+<h2>Getting the results online</h2>
+
+<p>It was one thing to get the data, clean the data, load the data and model the data -- it was quite another to get it all online. The main hurtle was setting up a remote server to mimic my local machine. Setting up dependencies for data science is not always a walk in the park, at least the first time around. Some of the libraries used for this project, including scikit-learn or numpy, need to be compiled from lower level languages before they can be used in python. Installing these on a clean Ubuntu machine with the pip package manger would often freeze and time out, especially on the free tier of AWS. At long last, I chose to launch an instance with miniconda already installed. After that, configuring the webserver, setting up the mongo database, and building the front end of the site (in Angular) followed. Some of this was</p>
+
+<h2>Sources of error and improvement</h2>
 
 <p>
 There are many reasons for why this model is not perfect. In machine learning applications, the error out of sample is a composition of error (which is itself a composition of bias and variance) in your model plus random noise, which is the sort of unexplained variation in a data set that is not captured causally. </p>

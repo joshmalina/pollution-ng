@@ -54,14 +54,15 @@
 
 	$scope.options = {
 		axes: {
-			x : {key: "date", type:"date"},
+			x : {key: "date", type:"date", ticksRotate: -45, ticksFormat: '%a %b %d'},
 			y: {type:'linear'}
 		},
 		series: [
 			{y: 'pollution', color: "#d62728", thickness: "4px"}
 		],
 		drawDots: false,
-		zoom: true	
+		zoom: true,
+		drawLegend: false
 	}
 
 	$scope.changeColor = function(val) {
@@ -74,19 +75,19 @@
 			max:50,
 			color: '#009966'
 		},{
-			min:51,
+			min:50,
 			max:100,
 			color:'#ffde33'
 		},{
-			min:101,
+			min:100,
 			max:150,
 			color:'#ff9933'
 		},{
-			min:151,
+			min:150,
 			max:200,
 			color:'#cc0033'
 		},{
-			min:201,
+			min:200,
 			max:300,
 			color:'#660099',
 		},{

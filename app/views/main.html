@@ -6,9 +6,8 @@
 
 <div ng-if="predictions" class="jumbotron" style="">
   <h2 class="text-center">Beijing pollution for the next 10 days</h2><br>
-  <linechart data="predictions" options="options" mode="" width="" height="500"></linechart>
+  <linechart data="predictions" options="options" mode="" width="" height="500"></linechart><br><br>
   <p>Latest: {{currently}} on {{updatedAt | date: 'EEEE, MMM d @ h a'}}</p>
-  <div>All times are China time</div>
 </div>
 
 
