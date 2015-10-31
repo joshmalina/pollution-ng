@@ -10,44 +10,16 @@
  angular.module('pollutionNgApp')
  .controller('MainCtrl', ['$scope', 'pollutionAPI', '$cookies', 'moment', '$q', function ($scope, pollutionAPI, $cookies, moment, $q) { 
 
- 	Date.prototype.addHours = function(h){
-    	this.setHours(this.getHours()+h);
-    	return this;
-	}	
-
-	
-	var defer = $q.defer();
-
-	// return forecast from local storage if cookies hasn't expired (set for 1 hour)
- 	if($cookies.get('forecast_still_valid') && (typeof localStorage.getItem('forecast') != 'undefined')) {
- 		var getPreds = JSON.parse(localStorage.getItem('forecast')); 		
- 		getPreds.predictions = prepDataForChart(getPreds.predictions);
- 		defer.resolve(getPreds)	
- 	} else {
- 		// else call api
- 		pollutionAPI.get_forecast({useLocalAPI: false}).then(function(values) {
-
- 			var preds = values.data;
- 			localStorage.setItem('forecast', JSON.stringify(preds));
- 			preds.predictions = prepDataForChart(preds.predictions)
-
- 			defer.resolve(preds);
- 			
- 			$cookies.put('forecast_still_valid', true, {expires: new Date().addHours(1)});
- 			// update local storage of forecast
- 			console.log(values.data);
- 		})
- 	} 	
-
-	defer.promise.then(function(preds) {
-		$scope.predictions = preds.predictions;
+	pollutionAPI.get_forecast({useLocalAPI: true}).then(function(preds) {
+		$scope.predictions = prepDataForChart(preds.predictions);
+		console.log($scope.predictions);
 		$scope.updatedAt = new Date(preds._id);
 		$scope.currently = preds.currently;
-	})
+	});
 
  	function prepDataForChart(data) {
  		return data.map(function(each) {
- 			return {x: data.indexOf(each), pollution: each.p, date: new Date(each.t_obj)}
+ 			return {x: data.indexOf(each), pollution: each.p, date: new Date(each.t_obj)};
  		}) 		
  	}
 
@@ -63,7 +35,7 @@
 		drawDots: false,
 		zoom: true,
 		drawLegend: false
-	}
+	};
 
 	$scope.changeColor = function(val) {
 		function between(value,min,max) {
