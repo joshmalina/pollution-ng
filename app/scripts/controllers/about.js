@@ -10,7 +10,7 @@
 angular.module('pollutionNgApp')
   .controller('AboutCtrl', ['$scope', 'pollutionAPI', '$cookies', function ($scope, pollutionAPI, $cookies) {
 	
-	pollutionAPI.get_errors({useLocalAPI: true}).then(function(values) {
+	pollutionAPI.get_errors({useLocalAPI: false}).then(function(values) {
 		
 		var keys = Object.keys(values);
 		var keysLength = keys.length;

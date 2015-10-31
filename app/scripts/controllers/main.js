@@ -10,7 +10,7 @@
  angular.module('pollutionNgApp')
  .controller('MainCtrl', ['$scope', 'pollutionAPI', '$cookies', 'moment', '$q', function ($scope, pollutionAPI, $cookies, moment, $q) { 
 
-	pollutionAPI.get_forecast({useLocalAPI: true}).then(function(preds) {
+	pollutionAPI.get_forecast({useLocalAPI: false}).then(function(preds) {
 		$scope.predictions = prepDataForChart(preds.predictions);
 		console.log($scope.predictions);
 		$scope.updatedAt = new Date(preds._id);

@@ -74,7 +74,7 @@ Since pollution values do not tend to completely refresh in the course of hour, 
 <h2>Measuring success</h2>
 
 <p>
-So how did we do? Our estimates on a test-set (a fraction of the data where the model was not trained) showed that our model explained nearly 78 percent of the variety in the target output (R-squared). This is a gauge of how our target (pollution) changes when the various weather predictions changed. If there is a strong correspondence, then we would see a higher R-squared. We also had an average error of around 32 (Root mean squared error), and we should expect this to be higher as we get further from the present.</p>
+Our estimates on a test-set (a fraction of the data where the model was not trained) showed that our model explained nearly 78 percent of the variety in the target output (R-squared). This is a gauge of how our target (pollution) changes when the various weather predictions changed. If there is a strong correspondence, then we would see a higher R-squared. We also had an average error of around 32 (Root mean squared error), and we should expect this to be higher as we get further from the present.</p>
 
 <p>In the figure below, we are plotting average hourly absolute error as a function of time. Since we are making 240 predictions at each hour (10 days * 24 hours), we can evaluate how well the model performs at various points leading up to the event. As we can see, the average error for the pollution value just 1 hour into the future is quite low, whereas the error steadily increases as we get further from the present</p>
 
@@ -86,45 +86,40 @@ So how did we do? Our estimates on a test-set (a fraction of the data where the 
 
 <h2>Getting the results online</h2>
 
-<p>It was one thing to get the data, clean the data, load the data and model the data -- it was quite another to get it all online. The main hurtle was setting up a remote server to mimic my local machine. Setting up dependencies for data science is not always a walk in the park, at least the first time around. Some of the libraries used for this project, including scikit-learn or numpy, need to be compiled from lower level languages before they can be used in python. Installing these on a clean Ubuntu machine with the pip package manger would often freeze and time out, especially on the free tier of AWS. At long last, I chose to launch an instance with miniconda already installed. After that, configuring the webserver, setting up the mongo database, and building the front end of the site (in Angular) followed. Some of this was</p>
+<p>For those interested in the engineering component of this application, the backend is running on an Amazon Elastic Compute Cloud instance, which is running ubuntu loaded with the set of scientific computing libraries provided by Anaconda. Since the random forest is kind of large and the generation of predictions a bit intensive, the memory requirements were such that the free tier of AWS was not sufficient -- though perhaps someone else could figure out how to host it for free! The application contains a Python api built using Flask, and stores predictions in a MongoDB provided MongoLab. The computations are performed with Scikit Learn's regression tree module, and the data was cleaned up and transformed using Pandas. The api serves up predictions to an Angular app hosted on Heroku.</p>
 
 <h2>Sources of error and improvement</h2>
 
 <p>
-There are many reasons for why this model is not perfect. In machine learning applications, the error out of sample is a composition of error (which is itself a composition of bias and variance) in your model plus random noise, which is the sort of unexplained variation in a data set that is not captured causally. </p>
-
-<p>
-For data precision, it might have been a concern that the weather data and pollution data are not captured in exactly the same place in Beijing. Pollution data is reported from the US Embassy, whereas weather comes from a station at the Beijing Airport, which is about 12 miles away. Given the fluctuation in pollution readings across even short distances, this could be a concern for the integrity of the data set. A way to mitigate this effect would be to incorporate data from many pollution and weather sensors throughout the city and approximate an average for the city. </p>
-
-<p>
-Potentially even more important would be the inclusion of other variables, such as traffic patterns and variation in industrial output, which may be correlated with our target. If anyone reading this has access to that data, I would be very interested in incorporating it. </p>
-
-<p>
-Of course, we are also limited by the ability of meteorologists to make accurate forecasts, since our predictions are so heavily dependent on weather. This is not really an area where we can improve.</p>
-<p>
-Outside areas of error, our application could be improved in a couple important ways.</p>
+ In machine learning, error can be understood as a compositions of a fallible model plus random noise. Random noise is the variation in a data set that cannot be captured by the predictor variable. The fallability of the model itself can be understood as a composition of bias and variance, which captures a central tension in statistical learning whereby a great fit on the training data very often fails to generalize to new observations. When I first started analyzing the data, I attempted to fit a high degree polynomial function to the training data. While it achieved a similarly high R-squared value to the random forest ultimately used here, it completely failed to perform well on the test set. Of course, there may ways, given the current data set and features used, to improve the predictive power -- perhaps a different learning algorithm could fit the data a bit better. Here we will focus on those features of the data itself that probably contributed to its error.</p>
 
 <ol>
 <li>
-Per hour error could be calculate to show prediction error as a function of time</li>
-<li>Visualizations could be improved</li>
+The pollution data and the weather data were collected approximately 12 miles away (pollution at the US Embassy, weather at the airport). If you've ever seen a <a href="http://aqicn.org/city/beijing/">map</a> of pollution readings in Beijing, you know that even short distances can result in different particulate readings. I can't say what effect this had on the model, but it could probably be mitigated by including readings from multiple stations (which are available from the Chinese government, though not as easily accessible).
+</li>
+<li>
+Some potentially interesting variables are missing from the data set, such as traffic patterns and variation in factory output. I was not able to find such data, though I would be very interested in including it.
+</li>
+<li>
+The weather forecast (which affects the predictions, not the model) is itself fallible, and so might similarly taint our pollution forecast.
+</li>
 </ol>
 
 <h2>Sources</h2>
-<p class="lead">The following authors and their books and course materials either directly inspired or helped me to understand or implement these learning methods</p>
+<p class="lead">The following authors and their books and course materials either directly inspired or helped me to understand or implement these learning methods.</p>
 
 <ol>
 	<li>
-Abu-Mostafa, Yaser. Learning from data. https://work.caltech.edu/telecourse.html -- An introductory machine learning course
+Abu-Mostafa, Yaser. <em>Learning from data</em>. <a href="https://work.caltech.edu/telecourse.html"> -- An introductory machine learning course</a>
 	</li>
 	<li>
-Hastie, et al. An introduction to statistical learning. http://www-bcf.usc.edu/~gareth/ISL/ -- Great write up of all things machine learning, including construction of decision trees, random forests
+Hastie, et al. <em>An introduction to statistical learning</em>. <a href="http://www-bcf.usc.edu/~gareth/ISL/"> Text of all things machine learning</a>, including construction of decision trees, random forests
 	</li>
 	<li>
-	Hamner, Ben. http://blog.kaggle.com/2012/05/01/chucking-everything-into-a-random-forest-ben-hamner-on-winning-the-air-quality-prediction-hackathon/ -- Write up of method for winning air pollution hackathon </li>
+	Hamner, Ben. <a href="http://blog.kaggle.com/2012/05/01/chucking-everything-into-a-random-forest-ben-hamner-on-winning-the-air-quality-prediction-hackathon/"> -- Write up of method for winning air pollution hackathon </a></li>
 	<li>
-	US Dept of State Mission in China</li>
-	<li>Wunderground API</li>
+	US Dept of State Mission in China, source of pollution data</li>
+	<li>Wunderground API, source of weather data</li>
 </ol>
 
 
