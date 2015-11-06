@@ -30,13 +30,18 @@ Air pollution in China is a grave concern for the environmental and public healt
 	</tr>
 	<tr>	
 		<td>4</td><td>Future Pollution</td><td>Our task to come up with</td>
-	</tr>	
+	</tr>
 	</thead>
 </table>
+
 
 <p>Each call to the Wunderground API exposed only 24 hours of weather data. With eight years of pollution data waiting to be matched, this <a href="https://github.com/joshmalina/pollution/blob/master/notebooks/Build_historical_weather_data.ipynb">required hundreds of calls to Wunderground, as well as a fair bit of cleaning, massaging and joining</a>.</p>
 
 <p>Early exploration of the data set revealed that weather factors such as wind speed, humidity and air pressure were correlated with changes in particulate density, but were also correlated with each other. Seasonal trends in pollution values (from earlier research), and the fact that the data were part of a time series pointed toward a more flexible model. Early linear approximations performed poorly out of sample. Pollution values themselves were not normally distributed, and extreme points distributed widely outside a few standard deviations of the mean were not uncommon.</p>
+
+<!-- <h2>What do the numbers mean?</h2>
+
+<p>AQI is</p> -->
 
 <h2>How do machines learn?</h2>
 
@@ -46,7 +51,7 @@ The machine learning process is not so different from educating a child. It lear
 <p>
 Less figuratively, that final success is the output of an algorithmically tuned function of weights (one or more for each of the relevant predictors) that enables the machine to apply a label or number to a new input. The machine starts with a naive or randomly selected set of weights, which move in one direction or another depending on how the model is built. In this case, I've used an ensemble of bootstrapped decision trees whose features were also randomly selected, known as a <a href="https://en.wikipedia.org/wiki/Random_forest">random forest</a> to make predictions for the count (or density) of air pollution. It was a good fit for my problem because it was a flexible learning model that wasn't as resistant to high leverage points as a linear (or sort of linear) system. It also didn't require too much fine tuning. 
 
-<img src="/images/tree_example.png" class="img-responsive"><label>A decision tree classifies vectors of features according to a series of conditions. Each input continues down the tree until arriving at a terminal node, where it waits for the rest of the data set to be processed. Upon completion, either a label or numeric value is assigned to all observations within and any new observations that happen down the same path.</label>
+<img src="/images/tree_example.png" class="img-responsive" style="margin-bottom: -40px;"><label>Figure 1: A decision tree classifies vectors of features according to a series of conditions. Each input continues down the tree until arriving at a terminal node, where it waits for the rest of the data set to be processed. Upon completion, either a label or numeric value is assigned to all observations within and any new observations that happen down the same path.</label>
 
 <p>
 A decision tree is a learning model that sorts inputs into a set of terminal nodes (or leaves), where each observation is assigned to a predictive class or value. The tree sorts by "asking" the data a series of yes-no questions. From root to leaf: "Is humidity less than 43.5? If so, go left. Else, go right." Once all inputs are placed in a terminal node, a classification scheme or regression pattern will assign a value to that input and to all future inputs that arrive in the same node. </p>
@@ -69,20 +74,48 @@ The data in this project exemplify a time series, wherein the pollution values a
 <p>
 Since pollution values do not tend to completely refresh in the course of hour, the particulate count at 2 pm is likely still counting those that were around at 3 p.m. Our model is greatly improved by incorporating n - k previous prediction values, but it is important not to overweight its significance -- as the model forecasts further out in time, previous pollution values are merely educated guesses, and so we need to expect a larger degree of error as we get further out. </p>
 
-<img src="/images/timeseries.png" class="img-responsive"><label>Pollution over the course of eight years in Beijing. The average is about 100, whereas 50 is the maximum that is considered healthy by the World Health Organization.</label>
+<img src="/images/timeseries.png" class="img-responsive" style="width:90%"><label>Figure 2: Pollution over the course of eight years in Beijing. The average is about 100, whereas 50 is the maximum that is considered healthy by the World Health Organization.</label>
 
-<h2>Measuring success</h2>
+<h2 id="measuringSuccess">Measuring success</h2>
+
+<p>How well did we do? That turns out to be a question with a complicated answer. I think we can confidently state that the weather is correlated with pollution values in Beijing -- though, for anyone who has spent time in the city -- that is not much of an insight. What makes measuring error and model performance more difficult in this case versus other applications is that our test data set does not resemble our forecast data.</p>
+
+<p>Normally, a test data set is a mirror of the training set, and is a sufficient proxy for real world success. In this case, that is not true. First of all, our training / test data's weather conditions are <em>recorded observations</em>. At a specific time in the past, they were recorded at a weather station in Beijing. They were <strong>not</strong> guesses. Our pollution forecasts, on the other hand, rely on guesses -- educated ones, of course, by meterologists or sophisticated models, but still guesses. I have not quantified the amount of error in our model that is a factor of wrong weather forecasts, though that would be interesting to see. </p>
+
+<p>More importantly, however, is that our forecast data is incomplete. One of the "great" predictors of this model is a weighted previous hour's pollution data. That is available for the first hour's prediction, but not the second hour's prediction, and certainly not the 100th hour's prediction. We have to create those value ourselves out of previous predictions. Thus, error analysis for this project is not complete once model building is over. Nay, we have to record our prediction's success as the model runs continously, and then conclude how well we've done.</p>
 
 <p>
-Our estimates on a test-set (a fraction of the data where the model was not trained) showed that our model explained nearly 78 percent of the variety in the target output (R-squared). This is a gauge of how our target (pollution) changes when the various weather predictions changed. If there is a strong correspondence, then we would see a higher R-squared. We also had an average error of around 32 (Root mean squared error), and we should expect this to be higher as we get further from the present.</p>
+Early estimates of error on a test-set (a fraction of the data where the model was not trained) showed that our model explained nearly 78 percent of the variety in the target output (R-squared). This is a gauge of how our target (pollution) changes when the various weather predictions changed. If there is a strong correspondence, then we would see a higher R-squared. We also had an average error of around 32 (Root mean squared error), and we should expect this to be higher as we get further from the present.</p>
 
-<p>In the figure below, we are plotting average hourly absolute error as a function of time. Since we are making 240 predictions at each hour (10 days * 24 hours), we can evaluate how well the model performs at various points leading up to the event. As we can see, the average error for the pollution value just 1 hour into the future is quite low, whereas the error steadily increases as we get further from the present</p>
+<h4>Error as a function of distance into future</h4>
+
+<p>In the figure below, we are plotting average hourly absolute error as a function of time. Since we are making 240 predictions at each hour (10 days * 24 hours), we can evaluate how well the model performs at various points leading up to the event. As we can see, the average error for the pollution value just 1 hour into the future is quite low, whereas the error steadily increases as we get further from the present.</p>
 
 <div ng-if="errors" class="jumbotron">
   <h2 class="text-center">Average hourly absolute error as a function of time</h2><br>
   <linechart data="errors" options="options" mode="" width="" height="500"></linechart><br>
-  <label>As our predictions stretch further into the future, our error increases.</label><br>
+  <label>Figure 3: As our predictions stretch further into the future, our error increases.</label><br>
 </div>
+
+<p>A more complete analysis, available only after the model's predictions has been recorded for a few weeks, reveals a more subtle picture. As it turns out, our model performs worse as time goes on -- which is to be expected, given that we are making predictions based on increasingly unreliable predictions as we cast out into the future. But this is only half true. Indeed, if the pollution values to be predicted are low -- that is, if it is going to be a clean day in Beijing -- it doesn't matter if that clean day is not for six days into the future: our model is accurate. Consider Figure 3. Our predictions seem to be getting monotonically worse until about 140 hours when it abruptly dips. What accounts for this? Well, that was when the pollution was very low.</p>
+<br>
+<div>
+<h2>Snapshot: model success 6 days in advance</h2>
+<img src="/images/dip-at-140-hours.png"><label>Figure 4: An abrupt dip in error for a prediction made 140 hours before the event</label></div>
+
+<p>
+This is both good news and bad news for our model. The bad news: our model does not perform well on high pollution values. The good news: it can accurately predict a good day for Beijing's skies even six days before the event occurs. The bottom line: trust us on good pollution days, and when pollution is bad, we can't tell you how bad it is. All we can say is not good.</p>
+
+<p>Really, what this is saying is that the weather is highly correlated with low pollution values, and not at all with high pollution values. Either that or the model is not doing enough with the existing data set.</p>
+
+<p>To more clearly witness how our model performs on various conditions that wind up producing various levels of pollution, consider figure 5.</p>
+
+<div ng-if="errors_by_val" class="jumbotron">
+  <h2 class="text-center">Average absolute error as a function of pollution value</h2><br>
+  <linechart data="errors_by_val" options="options_by_val" mode="" width="" height="500"></linechart><br>
+  <label>Figure 5: When our predictions are made for conditions which produce lower pollution values, the model performs quite well. But when conditions exist such that pollution values wind up being very high, our model performs poorly.</label><br>
+</div>
+
 
 <h2>Getting the results online</h2>
 

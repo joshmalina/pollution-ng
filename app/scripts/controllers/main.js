@@ -10,6 +10,8 @@
  angular.module('pollutionNgApp')
  .controller('MainCtrl', ['$scope', 'pollutionAPI', '$cookies', 'moment', '$q', function ($scope, pollutionAPI, $cookies, moment, $q) { 
 
+	// CHECK THAT FOR PRODUCTION ENVIRONMENT, LOCALAPI IS FALSE
+
 	pollutionAPI.get_forecast({useLocalAPI: false}).then(function(preds) {
 		$scope.predictions = prepDataForChart(preds.predictions);
 		console.log($scope.predictions);
