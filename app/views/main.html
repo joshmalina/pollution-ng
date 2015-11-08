@@ -1,10 +1,17 @@
 
+<style>
+  .vertical-text {
+  transform: rotate(270deg);
+  transform-origin: left bottom 0;
+  position: relative;
+  top:290px;
+  float:left;
+}
+</style>
 
-<!--div linear-chart chart-data="predPromise"></div-->
-
-<!--linechart data="predictions" options="options" mode="" width="" height=""></linechart-->
 
 <div ng-if="predictions" class="jumbotron" style="">
+  <span class="vertical-text">Predicted AQI</span>
   <h2 class="text-center">Beijing pollution for the next 10 days</h2><br>
   <linechart data="predictions" options="options" mode="" width="" height="500"></linechart><br><br>
   <p>Latest: {{currently}} on {{updatedAt | date: 'EEEE, MMM d @ h a'}}</p>
