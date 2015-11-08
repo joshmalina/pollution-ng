@@ -71,7 +71,7 @@ A decision tree sorts inputs into a set of leaves, and each leaf's final members
 A single tree is a poor model. It suffers from high variance -- small changes in inputs can lead to a very different approximation. This "instability" makes it unlikely to perform very well out of sample. Fortunately, if we grow many diverse trees and average their predictions we can lower our variance and thus our error. The sub-sampling is completed via the process <a href="https://en.wikipedia.org/wiki/Bootstrap_aggregating">of bagging.</a></p>
 
 <p>
-The random sampling of the predictors is the "random" in random forest -- each tree is grown with fewer than all avaialable predictors. For example, one tree may be grown on wind speed and humidity, whereas another is grown using temperature and air pressure. By preserving some variety in our forest, our final product is even better suited to correctly classifying new observations. Also, since some of our weather predictors are highly collinear, the forest spreads out the variance by not including all the predictors. In the presence of a few highly predictive variables, this randomness preserves diversity in tree construction that makes our averaging of their collective predictions meaningful, rather than the averaging of many clones.</p>
+The random sampling of the predictors is the "random" in random forest -- each tree is grown with fewer than all available predictors. For example, one tree may be grown on wind speed and humidity, whereas another is grown using temperature and air pressure. By preserving some variety in our forest, our final product is even better suited to correctly classifying new observations. Also, since some of our weather predictors are highly collinear, the forest spreads out the variance by not including all the predictors. In the presence of a few highly predictive variables, this randomness preserves diversity in tree construction that makes our averaging of their collective predictions meaningful, rather than the averaging of many clones.</p>
 
 <p>
 To get this random forest performing well, it is easy to set a large number of trees (500 or more) and allow it to build to any depth. However, since these results would need to be made available online (and there currently isn't a budget for a multi-node cluster of EC2 instances), it was important to minimize the size of the forest since it would be loaded into memory for the computations. Experimenting with different forest sizes showed that there was little decrease in error after about 100 trees.
@@ -89,7 +89,7 @@ In this time series, the pollution values are not independent -- which is to say
 <p>
 Early estimates of error on a test-set (a fraction of the data where the model was not trained) showed that our model explained nearly 78 percent of the variety in the target output (R-squared). This is a gauge of how our target (pollution) changes when the various weather predictions changed. If there is a strong correspondence, then we would see a higher R-squared. We also had an average error of around 32 (Root mean squared error), and we should expect this to be higher as we get further from the present.</p>
 
-<p>That analysis relies on the test data set, which is not quite the same as our forecasts. Our test set's weather conditions are <em>actual observations</em>. Our pollution forecasts, on the other hand, rely on guesses -- the weather forecast. Also, our validation set is incomplete. Previous pollution values -- which are themselves predictors -- can only be filled in at the time of prediction -- again, they are not recorded observations but guesses.</p>
+<p>That analysis relies on the test data set, which is not quite the same as our forecasts. Our test set's weather conditions are <em>actual observations</em>. Our pollution forecasts, on the other hand, rely on guesses -- the weather forecast. Also, our validation set is incomplete. Previous pollution values -- which are themselves predictors -- can only be filled in at the time of prediction -- and again, they are not recorded observations but guesses.</p>
 
 <h4>Error as a function of distance into future</h4>
 
@@ -104,17 +104,12 @@ Early estimates of error on a test-set (a fraction of the data where the model w
 </div>
 
 <p>Here we see the evidence. Indeed, if the pollution values to be predicted are low -- that is, if it is going to be a clean day in Beijing -- it doesn't matter if that clean day is not for six days into the future: our model is accurate. This explains the dip in Figure 3 -- which a screen shot, rather than a dynamically driven graph.</p>
-<br>
 <div>
 <h2>Snapshot: model success 6 days in advance</h2>
 <img src="/images/dip-at-140-hours-an.png"></div><br>
 
 <p>
-This is both good news and bad news for our model. The bad news: our model is not accurate for high pollution values. The good news: it can accurately predict a good day for Beijing's skies even six days before the event occurs. The bottom line: trust us on good pollution days, and when pollution is bad, we can't tell you how bad it is. All we can say is its not good.</p>
-
-<p>Really, what this is saying is that the weather is highly correlated with low pollution values, and not at all with high pollution values. Either that or the model is not doing enough with the existing data set.</p>
-
-<p>To more clearly witness how our model performs on various conditions that wind up producing various levels of pollution, consider figure 5.</p>
+This is both good news and bad news for our model. The bad news: our model is not accurate for high pollution values. The good news: it can accurately predict a good day for Beijing's skies even six days before the event occurs. The bottom line: trust us on good pollution days, and when pollution is bad, we can't tell you how bad it is. All we can say is its not good. So, the weather is highly correlated with low pollution values, and not at all with high pollution values. Either that or the model is not doing enough with the existing data set. To more clearly witness how our model performs on various conditions that wind up producing various levels of pollution, consider figure 5.</p>
 
 <div ng-if="errors_by_val" class="jumbotron">
   <h2 class="text-center">Average absolute error as a function of pollution value</h2><br>
