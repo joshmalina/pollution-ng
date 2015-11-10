@@ -93,7 +93,7 @@ angular.module('pollutionNgApp')
         return getData(FORECAST_COOKIE, FORECAST_LOCAL_STORAGE_KEY, endpoint, '/getLatest');
 		  },
       get_errors: function(endpoint) {
-        return getData(ERROR_COOKIE, ERROR_LOCAL_STORAGE_KEY, endpoint, '/getErrors');
+        return getData(ERROR_COOKIE, ERROR_LOCAL_STORAGE_KEY, endpoint, '/getLatestErrors');
       }
 
     }
