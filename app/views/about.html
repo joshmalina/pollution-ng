@@ -126,6 +126,14 @@ This is both good news and bad news for our model. The bad news: our model is no
   <label>Figure 5: Our model is less accurate for higher levels of pollution. </label><br>
 </div>
 
+<div class="jumbotron" style="background:white; border: 1px solid black;">
+  <h2 class="text-center">Error as a function of both time and value</h2><br>
+  <img src='/images/err_val_dist.png' style="width:100%; margin-left:-10px"/>
+  <br>
+  <label>Figure 6: This static image (generated Dec 12, 2015) is scatter plot representing a 1000 point sample of the more than 150k errors collected since the app launched. It indicates what the previous two charts reveal, but from a slightly different view. On the x-axis is time into the future the prediction was genereated for, and the y axis indicates what the actual pollution value was for the point in time that the prediction was generated for. Larger point sizes indicates a larger error. What we can see is that the model becomes virtually monotonically less valid as the actual pollution value rises -- after about 200 AQI, the model is no longer accurate. Changes in error as a function of time, on the other hand, is not very reflected -- which means two things: first, the model remains accurate (when it is accurate) far into the future and second, the model is innacurate for large AQI values even a few hours out of the gate.</label><br>
+</div>
+
+
 
 <h2>Getting the results online</h2>
 
