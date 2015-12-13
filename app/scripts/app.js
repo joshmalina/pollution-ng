@@ -16,8 +16,7 @@ angular
     'angular-loading-bar',
     'n3-line-chart',
     'googlechart',
-    'angularMoment',
-    'd3'    
+    'angularMoment' 
   ])
   .config(function ($routeProvider, $httpProvider) {
     $routeProvider
